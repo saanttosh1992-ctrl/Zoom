@@ -1,0 +1,50 @@
+name: Kaka SMP Bot
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Mineflayer
+        run: npm install mineflayer
+
+      - name: Run Kaka Bot
+        run: |
+          node -e "
+          const mineflayer = require('mineflayer');
+          
+          function createBot() {
+            const bot = mineflayer.createBot({
+              host: 'kakasmp7.aternos.me',
+              port: 58848,
+              username: 'Kaka',
+              version: '1.21.1'
+            });
+
+            bot.on('spawn', () => {
+              console.log('Kaka Bot server mein successfully aa gaya hai!');
+              setInterval(() => {
+                if (bot) {
+                  bot.setControlState('jump', true);
+                  setTimeout(() => bot.setControlState('jump', false), 500);
+                }
+              }, 15000);
+            });
+
+            bot.on('error', err => console.log('Bot Error:', err));
+            bot.on('end', () => console.log('Bot disconnect ho gaya.'));
+          }
+
+          createBot();
+          setTimeout(() => process.exit(0), 1200000);
+          "
+          
